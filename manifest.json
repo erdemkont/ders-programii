@@ -1,7 +1,7 @@
 {
   "name": "Ders Programı",
   "short_name": "Program",
-  "start_url": "/ders-programii/index.html"
+  "start_url": "/ders-programii/index.html",
   "display": "standalone",
   "background_color": "#f5f7fb",
   "theme_color": "#4a90e2",
