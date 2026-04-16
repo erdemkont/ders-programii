@@ -1,10 +1,10 @@
 self.addEventListener("install", e => {
     e.waitUntil(
-        caches.open("ders-programii").then(cache => {
+        caches.open("ders-programii-v2").then(cache => {
             return cache.addAll([
-                "/ders-programii/index.html"
-                "manifest.json",
-                "icon.png"
+                "/ders-programii/index.html",
+                "/ders-programii/manifest.json",
+                "/ders-programii/icon.png"
             ]);
         })
     );
