@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ders Programı</title>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#4a90e2">
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background: #f5f7fb;
+    text-align: center;
+}
+
+h1 {
+    background: #4a90e2;
+    color: white;
+    padding: 15px;
+    margin: 0;
+}
+
+.gunler {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    background: white;
+    padding: 10px;
+}
+
+button {
+    margin: 5px;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 8px;
+    background: #e0e7ff;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: #4a90e2;
+    color: white;
+}
+
+.aktif {
+    background: #4a90e2;
+    color: white;
+}
+
+table {
+    margin: 20px auto;
+    border-collapse: collapse;
+    width: 90%;
+    max-width: 500px;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+th, td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background: #f0f3ff;
+}
+
+td[contenteditable="true"] {
+    background: #fafafa;
+}
+
+td:focus {
+    outline: 2px solid #4a90e2;
+}
+
+@media (max-width: 600px) {
+    table {
+        width: 95%;
+    }
+}
+</style>
+
+</head>
+<body>
+
+<h1>Ders Programı</h1>
+
+<div class="gunler">
+    <button id="pzt" onclick="gunuGoster('pzt')">Pazartesi</button>
+    <button id="sal" onclick="gunuGoster('sal')">Salı</button>
+    <button id="car" onclick="gunuGoster('car')">Çarşamba</button>
+    <button id="per" onclick="gunuGoster('per')">Perşembe</button>
+    <button id="cum" onclick="gunuGoster('cum')">Cuma</button>
+</div>
+
+<table id="tablo"></table>
+
+<script>
+const saatler = [
+    "08:30 - 09:10",
+    "09:25 - 10:05",
+    "10:25 - 11:05",
+    "11:20 - 12:00",
+    "13:00 - 13:40",
+    "13:55 - 14:35",
+    "14:50 - 15:30"
+];
+
+let veriler = JSON.parse(localStorage.getItem("dersProgrami")) || {
+    pzt: Array(7).fill(""),
+    sal: Array(7).fill(""),
+    car: Array(7).fill(""),
+    per: Array(7).fill(""),
+    cum: Array(7).fill("")
+};
+
+let aktifGun = "pzt";
+
+function kaydet() {
+    localStorage.setItem("dersProgrami", JSON.stringify(veriler));
+}
+
+function gunuGoster(gun) {
+    aktifGun = gun;
+
+    // Buton rengini değiştir
+    document.querySelectorAll("button").forEach(btn => {
+        btn.classList.remove("aktif");
+    });
+    document.getElementById(gun).classList.add("aktif");
+
+    let tablo = document.getElementById("tablo");
+    tablo.innerHTML = "";
+
+    let baslik = document.createElement("tr");
+    baslik.innerHTML = "<th>Saat</th><th>Ders</th>";
+    tablo.appendChild(baslik);
+
+    for (let i = 0; i < 7; i++) {
+        let satir = document.createElement("tr");
+
+        let saatHucre = document.createElement("td");
+        saatHucre.innerText = saatler[i];
+
+        let dersHucre = document.createElement("td");
+        dersHucre.contentEditable = true;
+        dersHucre.innerText = veriler[gun][i];
+
+        dersHucre.oninput = function() {
+            veriler[aktifGun][i] = this.innerText;
+            kaydet();
+        };
+
+        satir.appendChild(saatHucre);
+        satir.appendChild(dersHucre);
+        tablo.appendChild(satir);
+    }
+}
+
+// Bugünün gününü bul
+function bugunuBul() {
+    let gun = new Date().getDay();
+
+    switch(gun) {
+        case 1: return "pzt";
+        case 2: return "sal";
+        case 3: return "car";
+        case 4: return "per";
+        case 5: return "cum";
+        default: return "pzt";
+    }
+}
+
+// Service Worker kaydı (PWA)
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("service-worker.js");
+}
+
+// Sayfa açılınca bugünü göster
+gunuGoster(bugunuBul());
+</script>
+
+</body>
+</html>
